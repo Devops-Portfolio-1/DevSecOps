@@ -30,6 +30,7 @@ pipeline {
                         --format 'ALL'
                         --prettyPrint
                     ''', odcInstallation: 'OWASP-DepCheck-10'
+                    // Publish the dependency check report and fail the build if critical vulnerabilities are found
                     dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
                 }
             }
