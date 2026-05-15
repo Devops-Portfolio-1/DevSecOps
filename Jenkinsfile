@@ -32,6 +32,11 @@ pipeline {
                     ''', odcInstallation: 'OWASP-DepCheck-10'
                     // Publish the dependency check report and fail the build if critical vulnerabilities are found
                     dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
+
+                    junit allowEmptyResults: true, keepProperties: true, testResults: 'dependency-check-junit.xml'
+
+                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+
                 }
             }
         }
