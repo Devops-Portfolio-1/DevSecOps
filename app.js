@@ -37,6 +37,17 @@ var dataSchema = new Schema({
 });
 var planetModel = mongoose.model('planets', dataSchema);
 
+const fallbackPlanets = [
+    { id: 1, name: 'Mercury' },
+    { id: 2, name: 'Venus' },
+    { id: 3, name: 'Earth' },
+    { id: 4, name: 'Mars' },
+    { id: 5, name: 'Jupiter' },
+    { id: 6, name: 'Saturn' },
+    { id: 7, name: 'Uranus' },
+    { id: 8, name: 'Neptune' }
+];
+
 
 
 app.post('/planet',   function(req, res) {
@@ -45,11 +56,20 @@ app.post('/planet',   function(req, res) {
         id: req.body.id
     }, function(err, planetData) {
         if (err) {
-            alert("Ooops, We only have 9 planets and a sun. Select a number from 0 - 9")
-            res.send("Error in Planet Data")
-        } else {
-            res.send(planetData);
+            console.error("Planet lookup failed", err)
+            return res.status(500).json({ error: "Error in Planet Data" });
         }
+
+        if (planetData) {
+            return res.status(200).json(planetData);
+        }
+
+        const fallback = fallbackPlanets.find((planet) => planet.id === req.body.id);
+        if (fallback) {
+            return res.status(200).json(fallback);
+        }
+
+        return res.status(404).json({ error: "Planet not found" });
     })
 })
 
