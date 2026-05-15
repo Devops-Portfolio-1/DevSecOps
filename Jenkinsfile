@@ -46,13 +46,14 @@ pipeline {
     }
 
     stage('Unit Testing') {
+        steps {
         withCredentials([usernamePassword(credentialsId: 'mongodb-cred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
             sh 'npm test'
 }
         junit allowEmptyResults: true, keepProperties: true, testResults: 'test-results.xml'
         // Publish the code coverage report and fail the build if coverage is below 90%
     }
-
+    
 
 }
 }
