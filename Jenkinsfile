@@ -3,7 +3,9 @@ pipeline {
     tools {
         nodejs 'Node.js 26.1.0'
     }
-
+    environment {
+        MONGO_URI = "mongodb+srv://shalindraperera151_db_user:hIgNO8IUucjbj3MW@cluster0.0awxr8z.mongodb.net/?appName=Cluster0"
+    }
     stages {
     stage('Installing Dependencies') {
         steps {
@@ -37,9 +39,20 @@ pipeline {
 
                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
 
+
                 }
             }
         }
     }
+
+    stage('Unit Testing') {
+        withCredentials([usernamePassword(credentialsId: 'mongodb-cred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+            sh 'npm test'
+}
+        junit allowEmptyResults: true, keepProperties: true, testResults: 'test-results.xml'
+        // Publish the code coverage report and fail the build if coverage is below 90%
+    }
+
+
 }
 }
