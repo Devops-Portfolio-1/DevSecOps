@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        nodejs 'Node.js 26.1.0'
+        nodejs 'Node.js 22.13.0'
     }
     environment {
         MONGO_URI = "mongodb+srv://shalindraperera151_db_user:hIgNO8IUucjbj3MW@cluster0.0awxr8z.mongodb.net/?appName=Cluster0"
