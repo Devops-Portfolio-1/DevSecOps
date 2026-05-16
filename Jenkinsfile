@@ -7,6 +7,7 @@ pipeline {
         MONGO_URI = "mongodb+srv://shalindraperera151_db_user:hIgNO8IUucjbj3MW@cluster0.0awxr8z.mongodb.net/?appName=Cluster0"
         MONGO_USERNAME = credentials('mongo-db-username')
         MONGO_PASSWORD = credentials('mongo-db-password')
+        SONAR_SCANNER_HOME = tool 'sonarqube-scanner-801'
     }
     stages {
     stage('Installing Dependencies') {
@@ -79,6 +80,19 @@ pipeline {
         }
 }
 
+      stage('SAST -SonarQube') {
+        steps {
+               sh 'echo $SONAR_SCANNER_HOME'
+               sh '''
+                   $SONAR_SCANNER_HOME/bin/sonar \
+                    -Dsonar.host.url=http://172.104.167.179:9000 \
+                    -Dsonar.token=sqp_285c5c049b1e52b8ea97de4fed0da7b8a1f0c246 \
+                    -Dsonar.projectKey=my-project
+                '''  
+                
+            }
+        }
+
  
     
     }
@@ -90,7 +104,7 @@ pipeline {
             //unit test results
             junit allowEmptyResults: true, keepProperties: true, testResults: 'test-results.xml'
             // Publish the code coverage report and fail the build if coverage is below 90%
-            
+
             // Publish the code coverage report
             publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'coverage/lcov-report', reportFiles: 'index.html', reportName: 'Code Coverage HTML Report', reportTitles: '', useWrapperFileDirectly: true])
 
