@@ -33,7 +33,7 @@ pipeline {
                         --scan './'
                         --out './'
                         --format 'ALL'
-                        --disableYarnAudit \ 
+                        --disableYarnAudit \
                         --prettyPrint
                     ''', odcInstallation: 'OWASP-DepCheck-10'
                     // Publish the dependency check report and fail the build if critical vulnerabilities are found
