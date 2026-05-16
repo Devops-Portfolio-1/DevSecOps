@@ -83,7 +83,7 @@ pipeline {
       stage('SAST -SonarQube') {
         steps {
             // timeout the SonarQube analysis to prevent it from hanging indefinitely
-            timeout(time: 60, unit: 'SECONDS') {
+            timeout(time: 300, unit: 'SECONDS') {
             withSonarQubeEnv('SonarQubeServer') {
                
                         sh "echo SonarQube Scanner Home: ${SONAR_SCANNER_HOME}"
