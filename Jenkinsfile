@@ -84,8 +84,10 @@ pipeline {
         steps {
             withSonarQubeEnv('SonarQubeServer') {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    def scannerHome = tool 'sonarqube-scanner-801'
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-project -Dsonar.token=$SONAR_TOKEN"
+                    script {
+                        def scannerHome = tool 'sonarqube-scanner-801'
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-project -Dsonar.token=$SONAR_TOKEN"
+                    }
                 }
             }
         }
