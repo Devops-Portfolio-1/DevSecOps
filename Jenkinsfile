@@ -82,16 +82,14 @@ pipeline {
 
       stage('SAST -SonarQube') {
         steps {
-               sh 'echo $SONAR_SCANNER_HOME'
-               sh '''
-                   $SONAR_SCANNER_HOME/bin/sonar \
-                    -Dsonar.host.url=http://172.104.167.179:9000 \
-                    -Dsonar.token=sqp_285c5c049b1e52b8ea97de4fed0da7b8a1f0c246 \
-                    -Dsonar.projectKey=my-project
-                '''  
-                
+            withSonarQubeEnv('SonarQubeServer') {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    def scannerHome = tool 'sonarqube-scanner-801'
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-project -Dsonar.token=$SONAR_TOKEN"
+                }
             }
         }
+      }
 
  
     
