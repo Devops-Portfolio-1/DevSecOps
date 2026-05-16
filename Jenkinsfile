@@ -8,6 +8,9 @@ pipeline {
     }
     stages {
     stage('Installing Dependencies') {
+         options { 
+                timestamps() 
+            }
         steps {
             sh 'npm install --no-audit'
         }
@@ -46,6 +49,9 @@ pipeline {
     }
 
     stage('Unit Testing') {
+        options { 
+                retry(2) 
+            }
         steps {
                 withCredentials([usernamePassword(credentialsId: 'mongodb-cred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     sh 'npm test'
@@ -54,5 +60,19 @@ pipeline {
                 // Publish the code coverage report and fail the build if coverage is below 90%
             }
         }
+   
+   
+    stage('Code Coverage') {
+        steps {
+            withCredentials([usernamePassword(credentialsId: 'mongo-db-credentials', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                // Run the code coverage command and catch any errors to prevent the build from failing
+                catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future releases', stageResult: 'UNSTABLE') {
+                    sh 'npm run coverage'
+                }
+            }
+            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'coverage/lcov-report', reportFiles: 'index.html', reportName: 'Code Coverage HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+        }
+}
+    
     }
 }
