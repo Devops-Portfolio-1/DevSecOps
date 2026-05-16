@@ -26,13 +26,14 @@ pipeline {
                     '''
                 }
             }
-            
+            //disable the yarn audit as we are using npm for this project
             stage('OWASP Dependency Check') {
                 steps {
                     dependencyCheck additionalArguments: '''
                         --scan './'
                         --out './'
                         --format 'ALL'
+                        --disableYarnAudit \ 
                         --prettyPrint
                     ''', odcInstallation: 'OWASP-DepCheck-10'
                     // Publish the dependency check report and fail the build if critical vulnerabilities are found
@@ -64,7 +65,7 @@ pipeline {
    
     stage('Code Coverage') {
         steps {
-            withCredentials([usernamePassword(credentialsId: 'mongo-db-credentials', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+            withCredentials([usernamePassword(credentialsId: 'mongodb-cred', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                 // Run the code coverage command and catch any errors to prevent the build from failing
                 catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future releases', stageResult: 'UNSTABLE') {
                     sh 'npm run coverage'
