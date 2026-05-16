@@ -91,7 +91,7 @@ pipeline {
                         ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=my-project \
                         -Dsonar.token=$SONAR_TOKEN \
-                        -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
+                        -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info 
 
                         '''
                     }
