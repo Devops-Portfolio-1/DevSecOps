@@ -85,8 +85,15 @@ pipeline {
             withSonarQubeEnv('SonarQubeServer') {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     script {
-                        def scannerHome = tool 'sonarqube-scanner-801'
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-project -Dsonar.token=$SONAR_TOKEN"
+                        //def scannerHome = tool 'sonarqube-scanner-801'
+                        sh '''
+                        
+                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=my-project \
+                        -Dsonar.token=$SONAR_TOKEN \
+                        -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
+
+                        '''
                     }
                 }
             }
