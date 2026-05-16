@@ -83,7 +83,7 @@ pipeline {
       stage('SAST -SonarQube') {
         steps {
             // timeout the SonarQube analysis to prevent it from hanging indefinitely
-            timeout(time: 300, unit: 'SECONDS') {
+            // timeout(time: 300, unit: 'SECONDS') {
             withSonarQubeEnv('SonarQubeServer') {
                
                         sh "echo SonarQube Scanner Home: ${SONAR_SCANNER_HOME}"
@@ -95,7 +95,7 @@ pipeline {
 
                         '''
                     
-            }
+            
             }
             waitForQualityGate abortPipeline: true
         }
@@ -128,3 +128,21 @@ pipeline {
         }
     }
 }
+
+
+
+// withSonarQubeEnv('SonarQubeServer') {
+//                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+//                     script {
+//                         //def scannerHome = tool 'sonarqube-scanner-801'
+//                         sh '''
+                        
+//                         ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+//                         -Dsonar.projectKey=my-project \
+//                         -Dsonar.token=$SONAR_TOKEN \
+//                         -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info 
+
+//                         '''
+//                     }
+//                 }
+//             }
