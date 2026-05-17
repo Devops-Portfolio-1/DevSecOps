@@ -10,6 +10,7 @@ pipeline {
         SONAR_SCANNER_HOME = tool 'sonarqube-scanner-801'
         ECR_REPO_URL = '450647752372.dkr.ecr.ap-southeast-1.amazonaws.com'
         IMAGE_REPO = "${ECR_REPO_URL}/nodejs-app"
+        JENKINS_CONTAINER_ID = 'a6fc479fd738'
     
     }
     stages {
@@ -113,31 +114,33 @@ pipeline {
       stage('Trivy Scan'){
         steps{
          sh '''
+            JENKINS_CONTAINER_ID="${JENKINS_CONTAINER_ID:-$HOSTNAME}"
+            TRIVY_OUT_DIR="$WORKSPACE"
             docker run --rm \
+                --volumes-from "$JENKINS_CONTAINER_ID" \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v /tmp/trivy-cache:/root/.cache/trivy \
-                -v /tmp:/output \
                 aquasec/trivy image \
                 --severity HIGH,CRITICAL \
                 --exit-code 0 \
                 --quiet \
-                --format json -o /output/trivy-results.json \
+                --format json -o "$TRIVY_OUT_DIR/trivy-results.json" \
                 ${IMAGE_REPO}:${BUILD_NUMBER}
         '''
       }
         post {
         always {    
             sh '''
+            JENKINS_CONTAINER_ID="${JENKINS_CONTAINER_ID:-$HOSTNAME}"
+            TRIVY_OUT_DIR="$WORKSPACE"
             docker run --rm \
+                --volumes-from "$JENKINS_CONTAINER_ID" \
                 -v /tmp/trivy-cache:/root/.cache/trivy \
-                -v /tmp:/output \
                 aquasec/trivy convert \
                 --format template \
                 --template "@/contrib/html.tpl" \
-                --output /output/trivy-results.html \
-                /output/trivy-results.json
-            
-            cp /tmp/trivy-results.html ${WORKSPACE}/trivy-results.html
+                --output "$TRIVY_OUT_DIR/trivy-results.html" \
+                "$TRIVY_OUT_DIR/trivy-results.json"
         '''
                 
     }
