@@ -109,7 +109,41 @@ pipeline {
             sh "docker build -t ${IMAGE_REPO}:$BUILD_NUMBER ."
         }
       }
-        
+
+      stage('Trivy Scan'){
+        steps{
+            sh '''
+            docker run --rm \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v /tmp/trivy-cache:/root/.cache/trivy \
+                -v $(pwd):$(pwd) \
+                -w $(pwd) \
+                aquasec/trivy image \
+                --severity CRITICAL \
+                --exit-code 0 \
+                --quiet \
+                --format json -o trivy-image-CRITICAL-results.json \
+                ${IMAGE_REPO}:${BUILD_NUMBER}
+        '''
+      }
+        post {
+        always {
+            sh '''
+                docker run --rm \
+                    -v /tmp/trivy-cache:/root/.cache/trivy \
+                    -v $(pwd):$(pwd) \
+                    -w $(pwd) \
+                    aquasec/trivy convert \
+                    --format template \
+                    --template "@/contrib/html.tpl" \
+                    --output trivy-image-CRITICAL-results.html \
+                    trivy-image-CRITICAL-results.json
+
+
+                    cp /tmp/trivy-results.html ${WORKSPACE}/trivy-results.html
+            '''
+                
+    }
         }
     //   stage('ECR Push') {
     //         steps {
@@ -143,6 +177,18 @@ pipeline {
             junit allowEmptyResults: true, keepProperties: true, testResults: 'dependency-check-junit.xml'
 
             publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+
+            //publish the trivy scan report
+            publishHTML([
+            allowMissing: true,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: '.',
+            reportFiles: 'trivy-results.html',
+            reportName: 'Trivy Security Report',
+            reportTitles: '',
+            useWrapperFileDirectly: true
+        ])
 
 
             // echo 'Cleaning up workspace...'
