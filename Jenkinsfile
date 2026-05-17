@@ -8,6 +8,9 @@ pipeline {
         MONGO_USERNAME = credentials('mongo-db-username')
         MONGO_PASSWORD = credentials('mongo-db-password')
         SONAR_SCANNER_HOME = tool 'sonarqube-scanner-801'
+        ECR_REPO_URL = '450647752372.dkr.ecr.ap-southeast-1.amazonaws.com'
+        IMAGE_REPO = "${ECR_REPO_URL}/nodejs-app"
+    
     }
     stages {
     stage('Installing Dependencies') {
@@ -100,10 +103,29 @@ pipeline {
             waitForQualityGate abortPipeline: true
         }
       }
+      stage('Build Docker Image') {
+
+        steps{
+            sh "docker build -t ${IMAGE_REPO}:$BUILD_NUMBER ."
+        }
+      }
+        
+        }
+    //   stage('ECR Push') {
+    //         steps {
+    //             script {
+    //                 echo "building the docker image..."
+    //                 withCredentials([usernamePassword(credentialsId: 'ecr-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+    //                     sh "echo $PASS | docker login -u $USER --password-stdin ${ECR_REPO_URL}"
+    //                     sh "docker push ${IMAGE_REPO}:$BUILD_NUMBER"
+    //                 }
+    //             }
+    //         }
+    //     }
 
  
     
-    }
+    
 
 
     post {
@@ -131,18 +153,3 @@ pipeline {
 
 
 
-// withSonarQubeEnv('SonarQubeServer') {
-//                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-//                     script {
-//                         //def scannerHome = tool 'sonarqube-scanner-801'
-//                         sh '''
-                        
-//                         ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-//                         -Dsonar.projectKey=my-project \
-//                         -Dsonar.token=$SONAR_TOKEN \
-//                         -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info 
-
-//                         '''
-//                     }
-//                 }
-//             }
