@@ -156,7 +156,7 @@ pipeline {
     //     }
 
  
-    
+    }
     
 
 
@@ -193,8 +193,8 @@ pipeline {
             // cleanWs() 
         }
     }
+
 }
-    }
 
 
 
