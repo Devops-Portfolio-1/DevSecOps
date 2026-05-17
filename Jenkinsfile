@@ -112,36 +112,33 @@ pipeline {
 
       stage('Trivy Scan'){
         steps{
-            sh '''
+         sh '''
             docker run --rm \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v /tmp/trivy-cache:/root/.cache/trivy \
-                -v $(pwd):$(pwd) \
-                -w $(pwd) \
+                -v /tmp:/output \
                 aquasec/trivy image \
-                --severity CRITICAL \
+                --severity HIGH,CRITICAL \
                 --exit-code 0 \
                 --quiet \
-                --format json -o trivy-image-CRITICAL-results.json \
+                --format json -o /output/trivy-results.json \
                 ${IMAGE_REPO}:${BUILD_NUMBER}
         '''
       }
         post {
         always {
             sh '''
-                docker run --rm \
-                    -v /tmp/trivy-cache:/root/.cache/trivy \
-                    -v $(pwd):$(pwd) \
-                    -w $(pwd) \
-                    aquasec/trivy convert \
-                    --format template \
-                    --template "@/contrib/html.tpl" \
-                    --output trivy-image-CRITICAL-results.html \
-                    trivy-image-CRITICAL-results.json
-
-
-                    cp /tmp/trivy-results.html ${WORKSPACE}/trivy-results.html
-            '''
+            docker run --rm \
+                -v /tmp/trivy-cache:/root/.cache/trivy \
+                -v /tmp:/output \
+                aquasec/trivy convert \
+                --format template \
+                --template "@/contrib/html.tpl" \
+                --output /output/trivy-results.html \
+                /output/trivy-results.json
+            
+            cp /tmp/trivy-results.html ${WORKSPACE}/trivy-results.html
+        '''
                 
     }
         }
