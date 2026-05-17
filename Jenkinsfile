@@ -126,7 +126,7 @@ pipeline {
         '''
       }
         post {
-        always {
+        always {    
             sh '''
             docker run --rm \
                 -v /tmp/trivy-cache:/root/.cache/trivy \
@@ -142,6 +142,7 @@ pipeline {
                 
     }
         }
+      }
     //   stage('ECR Push') {
     //         steps {
     //             script {
@@ -194,7 +195,7 @@ pipeline {
     }
 }
     }
-}
+
 
 
 
