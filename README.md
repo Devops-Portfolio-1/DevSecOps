@@ -1,4 +1,4 @@
-# Solar System NodeJS Application
+# DevSecOPs Pipeline 
 
 A simple HTML+MongoDB+NodeJS project to display Solar System and it's planets.
 
