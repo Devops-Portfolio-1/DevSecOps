@@ -1,6 +1,8 @@
-# Solar System NodeJS Application
+# DevSecops Pipeline
 
-A simple HTML+MongoDB+NodeJS project to display Solar System and it's planets.
+A simple HTML+MongoDB+NodeJS project on devsecops pipeline, with unit testing and code coverage.
+
+![DevSecOps Pipeline](readme-images/pipeline.png)
 
 ---
 ## Requirements
